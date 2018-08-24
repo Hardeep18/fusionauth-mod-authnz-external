@@ -1,0 +1,28 @@
+<VirtualHost *:443>
+  ServerAdmin dev@fusionauth.io
+  ServerName example.fusionauth.io
+
+  ErrorLog ${APACHE_LOG_DIR}/example.fusionauth.error.log
+  CustomLog ${APACHE_LOG_DIR}/example.fusionauth.access.log combined
+  LogLevel debug
+
+  DocumentRoot "/var/www/example"
+  # external_script, fusionauth_url, application_id role (optional)
+  #   - If a role is provided the user will be verified to not only be registered for the specified application but also be granted the role by name.
+  #   - If a role is not provided the user will only be verified to be registered for the specified application.
+  DefineExternalAuth fusionauth pipe "/usr/local/fusionauth/config/fusionauth_external.sh <APPLICATION_ID> <ROLE>"
+
+  # Secured directory using the external auth provider with the shared object cache
+  <Directory /var/www/example/secure>
+    AuthType Basic
+    AuthName "Authenticated Users Only"
+    AuthBasicProvider socache external
+    AuthExternalProvideCache On
+    AuthnCacheProvideFor external
+    # Cache timeout in seconds. Lower is better for security, higher is better for performance.
+    AuthnCacheTimeout 30
+    AuthExternal fusionauth
+    require valid-user
+  </Directory>
+
+</VirtualHost>

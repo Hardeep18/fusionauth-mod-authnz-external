@@ -1,0 +1,42 @@
+/*
+ * Copyright (c) 2016-2018, FusionAuth, All Rights Reserved
+ */
+savantVersion = "1.0.0"
+
+project(group: "io.fusionauth", name: "fusionauth-mod-authnz-external", version: "1.0", licenses: ["ApacheV2_0"]) {
+  workflow {
+    standard()
+  }
+
+  publishWorkflow {
+    subversion(repository: "http://svn.inversoft.org/savant")
+  }
+
+  publications {
+    main {
+    }
+  }
+}
+
+// Plugins
+file = loadPlugin(id: "org.savantbuild.plugin:file:${savantVersion}")
+idea = loadPlugin(id: "org.savantbuild.plugin:idea:1.0.1")
+release = loadPlugin(id: "org.savantbuild.plugin:release-git:${savantVersion}")
+
+target(name: "clean", description: "Cleans build directory") {
+  file.prune(dir: "build")
+}
+
+target(name: "int", description: "No-op") {
+}
+
+target(name: "idea", description: "Updates the IntelliJ IDEA module file") {
+  idea.iml()
+}
+
+target(name: "test", description: "No-op") {
+}
+
+target(name: "release", description: "Releases a full version of the project", dependsOn: ["int"]) {
+  release.release()
+}
